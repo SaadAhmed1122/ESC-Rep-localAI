@@ -60,7 +60,8 @@ CLI (esglocal)              ├─> core: catalog · formula · mapping · calcu
 | UI boot | `esglocal ui` | Healthy, listening on 127.0.0.1 only |
 | Security review | security-reviewer agent | 1 HIGH (browser-side exfiltration through rendered Markdown images) and 4 MEDIUM, all fixed with regression tests |
 | Code review | python-reviewer agent | 3 HIGH (period ordering, date round-trip, locale numbers) and several MEDIUM, all fixed with regression tests |
-| Release hygiene | opensource-sanitizer agent | secrets, PII and third-party-content scan before publishing |
+| Release hygiene | opensource-sanitizer agent | PASS: no secrets, PII or copied third-party content |
+| Docker | `docker compose up` (app + Ollama), run by the maintainer | Image builds and runs. The app works against the containerised Ollama. |
 
 ## 6. Roadmap (post-v0.1, contributions welcome)
 

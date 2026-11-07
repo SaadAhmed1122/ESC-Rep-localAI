@@ -33,6 +33,26 @@ server on your machine (LM Studio, llama.cpp, vLLM, LocalAI, Jan).
 | 🧠 **Any local model** | Pick from installed models, pull new ones, or **import a `.gguf` file** for air-gapped machines. |
 | 🛡️ **Privacy by design** | An offline network guard blocks the app's own outbound traffic. The model endpoint must be loopback. The vault is encrypted (scrypt + Fernet), the audit log is tamper-evident, PII is redacted from prompts, and remote links and images are stripped from AI output. |
 
+## Screenshots
+
+The data below is the bundled sample company, which is fictional.
+
+**Dashboard.** Overall and per-pillar scores with materiality weights, category bars and a KPI radar.
+
+![ESG dashboard](screenshots/dashboard.png)
+
+**AI advisor chat.** Answers come from your own KPIs, scores and documents through tool calls to a local model.
+
+![ESG advisor chat](screenshots/advisor.png)
+
+<table>
+  <tr>
+    <td width="33%"><img src="screenshots/agents.png" alt="Multi-agent ESG report"><br><sub><b>Multi-agent report:</b> quality checks → E/S/G analysts → strategist → critic → writer</sub></td>
+    <td width="33%"><img src="screenshots/what-if.png" alt="What-if simulator"><br><sub><b>What-if simulator:</b> move inputs and see the scores change instantly</sub></td>
+    <td width="33%"><img src="screenshots/models-privacy.png" alt="Models and privacy settings"><br><sub><b>Models &amp; privacy:</b> pick a local model and check the privacy status</sub></td>
+  </tr>
+</table>
+
 ## Quick start
 
 ```bash
