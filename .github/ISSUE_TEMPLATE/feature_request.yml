@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest an idea, KPI, industry or integration
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / use case
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+  - type: checkboxes
+    id: local
+    attributes:
+      label: Privacy
+      options:
+        - label: This feature works fully offline and sends no data off-device
+          required: true

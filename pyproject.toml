@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "esglocal"
+version = "0.1.0"
+description = "Privacy-first ESG reporting & multi-agent advisor that runs 100% locally with Ollama or any local LLM."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "ESG Local AI contributors" }]
+keywords = ["esg", "sustainability", "csrd", "gri", "ollama", "local-llm", "agents", "privacy"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "pyyaml>=6.0",
+  "httpx>=0.27",
+  "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+ui = ["streamlit>=1.40", "plotly>=5.20", "openpyxl>=3.1"]
+docs = ["pypdf>=4.0"]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.6"]
+all = ["esglocal[ui,docs]"]
+
+[project.scripts]
+esglocal = "esglocal.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/SaadAhmed1122/ESC-Rep-localAI"
+Issues = "https://github.com/SaadAhmed1122/ESC-Rep-localAI/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/esglocal"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = [
+  "S101",    # assert is fine in tests
+  "E501",    # line length is handled by `ruff format`
+  "SIM102",  # nested ifs are sometimes clearer
+  "SIM105",  # explicit try/except/pass is clearer for OS permission fallbacks
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]

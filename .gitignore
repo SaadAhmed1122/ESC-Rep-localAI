@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Local secrets & user data — never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.db
+*.sqlite
+vault.db
+documents.db
+audit.log
+.esglocal/
+esg_report*.md
+esg_report*.html
+esg_workspace*.json
+
+# Models
+*.gguf
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Tool caches
+graphify-out/
