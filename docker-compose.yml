@@ -1,0 +1,51 @@
+# ESG Local AI + Ollama.
+#   docker compose up -d
+#   docker compose exec ollama ollama pull qwen2.5:7b
+#   open http://127.0.0.1:8501
+#
+# Networks:
+#   models (internal: true) — app <-> ollama traffic, no internet route.
+#   web                     — only so Docker can publish the UI on 127.0.0.1. The app's own
+#                             outbound traffic is blocked in-process by the offline guard
+#                             (ESGLOCAL_OFFLINE=1); add a host firewall rule for kernel-level
+#                             enforcement.
+#   egress                  — lets ollama pull models. Remove ollama from it after pulling
+#                             for a fully air-gapped model runtime.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama:/root/.ollama
+    networks: [models, egress]
+    restart: unless-stopped
+    # GPU (NVIDIA): uncomment
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
+  app:
+    build: .
+    depends_on: [ollama]
+    environment:
+      ESGLOCAL_BASE_URL: http://ollama:11434
+      ESGLOCAL_ALLOWED_HOSTS: ollama
+      ESGLOCAL_OFFLINE: "1"
+      # ESGLOCAL_PASSPHRASE: provide via a local .env file — never commit it
+    volumes:
+      - esgdata:/data
+    ports:
+      - "127.0.0.1:8501:8501"   # reachable from this computer only
+    networks: [models, web]
+    restart: unless-stopped
+
+networks:
+  models:
+    internal: true
+  web: {}
+  egress: {}
+
+volumes:
+  ollama:
+  esgdata:

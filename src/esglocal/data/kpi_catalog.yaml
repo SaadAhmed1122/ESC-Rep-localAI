@@ -1,0 +1,459 @@
+# ESG Local AI — KPI catalog
+#
+# Written from scratch for this project and released under the project license.
+# Framework references (GRI / ESRS / EU Taxonomy) are indicative mappings to help
+# users find the corresponding disclosure; they are not an official crosswalk.
+#
+# Benchmarks (best / worst) are ILLUSTRATIVE defaults used to normalise each KPI
+# to a 0-100 score. Industries may override them below, and users can override
+# them in the UI. Replace them with your own peer data for real reporting.
+#
+# formula: a restricted arithmetic expression over the KPI's input names.
+#          Allowed: + - * / ( ) numbers, min(), max(), abs(). Nothing else.
+# aggregate: how each input is combined across rows of the same period
+#            (sum for flows such as tonnes / MWh, mean for stock values).
+
+version: 1
+
+categories:
+  Environmental: {code: E, description: "Climate, energy, water, waste and pollution"}
+  Social: {code: S, description: "Workforce, health & safety, diversity, customers"}
+  Governance: {code: G, description: "Board, ethics, compliance, supply chain, capital allocation"}
+
+kpis:
+  # ------------------------------------------------------------------ ENVIRONMENTAL
+  - id: E-ENERGY-INT
+    name: Energy intensity
+    category: Environmental
+    unit: MWh per EUR m revenue
+    formula: total_energy_mwh / revenue_meur
+    higher_is_better: false
+    benchmark: {best: 20, worst: 400}
+    frameworks: [GRI 302-3, ESRS E1-5]
+    description: Total energy consumed relative to revenue.
+    inputs:
+      - {name: total_energy_mwh, description: Total energy consumed (all sources), unit: MWh, aliases: [energy consumption, total energy, energy mwh]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aggregate: sum, aliases: [revenue, turnover, net sales, sales]}
+
+  - id: E-RENEW-SHARE
+    name: Renewable energy share
+    category: Environmental
+    unit: "%"
+    formula: renewable_energy_mwh / total_energy_mwh * 100
+    higher_is_better: true
+    benchmark: {best: 100, worst: 0}
+    frameworks: [GRI 302-1, ESRS E1-5]
+    description: Share of energy consumption from renewable sources.
+    inputs:
+      - {name: renewable_energy_mwh, description: Energy from renewable sources, unit: MWh, aliases: [renewable energy, green energy, renewables]}
+      - {name: total_energy_mwh, description: Total energy consumed (all sources), unit: MWh, aliases: [energy consumption, total energy]}
+
+  - id: E-GHG-INT
+    name: GHG intensity (Scope 1+2)
+    category: Environmental
+    unit: tCO2e per EUR m revenue
+    formula: (scope1_tco2e + scope2_tco2e) / revenue_meur
+    higher_is_better: false
+    benchmark: {best: 5, worst: 300}
+    frameworks: [GRI 305-4, ESRS E1-6]
+    description: Direct and energy-indirect greenhouse-gas emissions relative to revenue.
+    inputs:
+      - {name: scope1_tco2e, description: Direct (Scope 1) emissions, unit: tCO2e, aliases: [scope 1, scope1 emissions, direct emissions]}
+      - {name: scope2_tco2e, description: Energy indirect (Scope 2, market-based) emissions, unit: tCO2e, aliases: [scope 2, scope2 emissions, indirect emissions]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aliases: [revenue, turnover, net sales]}
+
+  - id: E-GHG-TOTAL
+    name: GHG emissions, total (Scope 1+2)
+    category: Environmental
+    unit: tCO2e
+    formula: scope1_tco2e + scope2_tco2e
+    higher_is_better: false
+    scored: false   # absolute value — shown for reporting, not scored (size-dependent)
+    frameworks: [GRI 305-1, GRI 305-2, ESRS E1-6]
+    description: Absolute gross Scope 1 and Scope 2 emissions.
+    inputs:
+      - {name: scope1_tco2e, description: Direct (Scope 1) emissions, unit: tCO2e, aliases: [scope 1, direct emissions]}
+      - {name: scope2_tco2e, description: Energy indirect (Scope 2) emissions, unit: tCO2e, aliases: [scope 2, indirect emissions]}
+
+  - id: E-GHG-YOY
+    name: GHG reduction vs prior year
+    category: Environmental
+    unit: "%"
+    formula: (prior_scope12_tco2e - (scope1_tco2e + scope2_tco2e)) / prior_scope12_tco2e * 100
+    higher_is_better: true
+    benchmark: {best: 10, worst: -5}
+    frameworks: [ESRS E1-4]
+    description: Year-on-year reduction of Scope 1+2 emissions (positive = reduction).
+    inputs:
+      - {name: prior_scope12_tco2e, description: Prior-year Scope 1+2 emissions, unit: tCO2e, aliases: [prior year emissions, previous emissions, last year emissions]}
+      - {name: scope1_tco2e, description: Direct (Scope 1) emissions, unit: tCO2e, aliases: [scope 1]}
+      - {name: scope2_tco2e, description: Energy indirect (Scope 2) emissions, unit: tCO2e, aliases: [scope 2]}
+
+  - id: E-WATER-INT
+    name: Water withdrawal intensity
+    category: Environmental
+    unit: m3 per EUR m revenue
+    formula: water_withdrawal_m3 / revenue_meur
+    higher_is_better: false
+    benchmark: {best: 50, worst: 2000}
+    frameworks: [GRI 303-3, ESRS E3-4]
+    description: Water withdrawn relative to revenue.
+    inputs:
+      - {name: water_withdrawal_m3, description: Total water withdrawal, unit: m3, aliases: [water withdrawal, water consumption, water use]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aliases: [revenue, turnover, net sales]}
+
+  - id: E-WASTE-RECYCLED
+    name: Waste recycled or recovered
+    category: Environmental
+    unit: "%"
+    formula: waste_recycled_t / waste_total_t * 100
+    higher_is_better: true
+    benchmark: {best: 90, worst: 10}
+    frameworks: [GRI 306-4, ESRS E5-5]
+    description: Share of total waste diverted from disposal.
+    inputs:
+      - {name: waste_recycled_t, description: Waste recycled or otherwise recovered, unit: t, aliases: [recycled waste, waste recycled, recovered waste]}
+      - {name: waste_total_t, description: Total waste generated, unit: t, aliases: [total waste, waste generated]}
+
+  - id: E-HAZ-WASTE
+    name: Hazardous waste share
+    category: Environmental
+    unit: "%"
+    formula: hazardous_waste_t / waste_total_t * 100
+    higher_is_better: false
+    benchmark: {best: 1, worst: 30}
+    frameworks: [GRI 306-3, ESRS E5-5]
+    description: Hazardous waste as a share of total waste generated.
+    inputs:
+      - {name: hazardous_waste_t, description: Hazardous waste generated, unit: t, aliases: [hazardous waste]}
+      - {name: waste_total_t, description: Total waste generated, unit: t, aliases: [total waste, waste generated]}
+
+  - id: E-TRANSITION-PLAN
+    name: Climate transition plan
+    category: Environmental
+    type: qualitative
+    frameworks: [ESRS E1-1, GRI 305]
+    description: Narrative describing the company's climate targets and transition plan.
+    exemplars:
+      best: >-
+        We have a science-based net-zero target validated by SBTi, with interim 2030 targets to
+        cut Scope 1 and 2 emissions by 50% and Scope 3 by 30% from a 2020 baseline. The board
+        approves the transition plan annually, capital expenditure is aligned with it, progress is
+        assured by a third party, and executive pay is linked to emission reductions.
+      worst: >-
+        We do not currently have climate targets or a transition plan. Emissions are not
+        measured and climate change is not considered a material topic for the business.
+
+  # ------------------------------------------------------------------ SOCIAL
+  - id: S-TURNOVER
+    name: Employee turnover rate
+    category: Social
+    unit: "%"
+    formula: employees_left / avg_headcount * 100
+    higher_is_better: false
+    benchmark: {best: 5, worst: 30}
+    frameworks: [GRI 401-1, ESRS S1-6]
+    description: Employees leaving during the period relative to average headcount.
+    inputs:
+      - {name: employees_left, description: Employees who left during the period, unit: persons, aliases: [leavers, employees leaving, fte leaving, attrition]}
+      - {name: avg_headcount, description: Average headcount (FTE), unit: FTE, aggregate: sum, aliases: [headcount, fte, employees, total fte, workforce]}
+
+  - id: S-TRAINING-HOURS
+    name: Training hours per employee
+    category: Social
+    unit: hours per FTE
+    formula: training_hours / avg_headcount
+    higher_is_better: true
+    benchmark: {best: 40, worst: 4}
+    frameworks: [GRI 404-1, ESRS S1-13]
+    description: Average hours of training per employee per year.
+    inputs:
+      - {name: training_hours, description: Total training hours delivered, unit: hours, aliases: [training hours, hours of training]}
+      - {name: avg_headcount, description: Average headcount (FTE), unit: FTE, aliases: [headcount, fte, employees]}
+
+  - id: S-TRAINING-SPEND
+    name: Training spend per employee
+    category: Social
+    unit: EUR per FTE
+    formula: training_spend_eur / avg_headcount
+    higher_is_better: true
+    benchmark: {best: 1500, worst: 100}
+    frameworks: [GRI 404]
+    description: Average training expenditure per employee.
+    inputs:
+      - {name: training_spend_eur, description: Total training expenditure, unit: EUR, aliases: [training expenses, training spend, training cost]}
+      - {name: avg_headcount, description: Average headcount (FTE), unit: FTE, aliases: [headcount, fte, employees]}
+
+  - id: S-LTIFR
+    name: Lost-time injury frequency rate
+    category: Social
+    unit: per million hours worked
+    formula: lost_time_injuries * 1000000 / hours_worked
+    higher_is_better: false
+    benchmark: {best: 0.5, worst: 10}
+    frameworks: [GRI 403-9, ESRS S1-14]
+    description: Lost-time injuries per million hours worked.
+    inputs:
+      - {name: lost_time_injuries, description: Number of lost-time injuries, unit: count, aliases: [injuries, lost time injuries, lti]}
+      - {name: hours_worked, description: Total hours worked, unit: hours, aliases: [hours worked, working hours, total hours]}
+
+  - id: S-FATALITIES
+    name: Work-related fatalities
+    category: Social
+    unit: count
+    formula: fatalities
+    higher_is_better: false
+    benchmark: {best: 0, worst: 2}
+    frameworks: [GRI 403-9, ESRS S1-14]
+    description: Number of fatalities as a result of work-related injury.
+    inputs:
+      - {name: fatalities, description: Work-related fatalities, unit: count, aliases: [deaths, fatality]}
+
+  - id: S-WOMEN-MGMT
+    name: Women in management
+    category: Social
+    unit: "%"
+    formula: women_in_management / total_management * 100
+    higher_is_better: true
+    benchmark: {best: 50, worst: 10}
+    frameworks: [GRI 405-1, ESRS S1-9]
+    description: Share of management positions held by women.
+    inputs:
+      - {name: women_in_management, description: Women in management positions, unit: persons, aliases: [female managers, women managers]}
+      - {name: total_management, description: Total management positions, unit: persons, aliases: [managers, management headcount]}
+
+  - id: S-PAY-GAP
+    name: Unadjusted gender pay gap
+    category: Social
+    unit: "%"
+    formula: (avg_male_pay - avg_female_pay) / avg_male_pay * 100
+    higher_is_better: false
+    benchmark: {best: 0, worst: 25}
+    frameworks: [ESRS S1-16, GRI 405-2]
+    description: Difference between average male and female pay as % of male pay.
+    inputs:
+      - {name: avg_male_pay, description: Average gross pay of male employees, unit: EUR, aggregate: mean, aliases: [male pay, average male salary]}
+      - {name: avg_female_pay, description: Average gross pay of female employees, unit: EUR, aggregate: mean, aliases: [female pay, average female salary]}
+
+  - id: S-CUSTOMER-SAT
+    name: Customer satisfaction
+    category: Social
+    unit: "%"
+    formula: satisfied_customers / customers_surveyed * 100
+    higher_is_better: true
+    benchmark: {best: 95, worst: 50}
+    frameworks: [GRI 2-29]
+    description: Share of surveyed customers reporting they are satisfied.
+    inputs:
+      - {name: satisfied_customers, description: Customers reporting satisfaction, unit: count, aliases: [satisfied customers]}
+      - {name: customers_surveyed, description: Customers surveyed, unit: count, aliases: [customers surveyed, survey respondents]}
+
+  - id: S-HUMAN-RIGHTS
+    name: Human rights due diligence
+    category: Social
+    type: qualitative
+    frameworks: [GRI 2-23, ESRS S2-1]
+    description: Narrative describing the human-rights policy and due-diligence process.
+    exemplars:
+      best: >-
+        Our board-approved human rights policy is aligned with the UN Guiding Principles and OECD
+        Guidelines. We run an annual risk-based due diligence covering own operations and tier-1
+        and tier-2 suppliers, operate an anonymous grievance mechanism open to external
+        stakeholders, remediate findings with tracked action plans and publish the results.
+      worst: >-
+        We have no human rights policy. Supplier working conditions are not assessed and there is
+        no grievance mechanism for workers or communities.
+
+  # ------------------------------------------------------------------ GOVERNANCE
+  - id: G-BOARD-INDEP
+    name: Board independence
+    category: Governance
+    unit: "%"
+    formula: independent_directors / board_size * 100
+    higher_is_better: true
+    benchmark: {best: 75, worst: 20}
+    frameworks: [GRI 2-9, ESRS GOV-1]
+    description: Share of independent members on the board.
+    inputs:
+      - {name: independent_directors, description: Independent board members, unit: persons, aggregate: mean, aliases: [independent directors, independent board members]}
+      - {name: board_size, description: Total board members, unit: persons, aggregate: mean, aliases: [board members, directors, board size]}
+
+  - id: G-BOARD-WOMEN
+    name: Women on the board
+    category: Governance
+    unit: "%"
+    formula: women_on_board / board_size * 100
+    higher_is_better: true
+    benchmark: {best: 50, worst: 10}
+    frameworks: [GRI 405-1, ESRS GOV-1]
+    description: Share of board seats held by women.
+    inputs:
+      - {name: women_on_board, description: Women on the board, unit: persons, aggregate: mean, aliases: [female directors, women directors]}
+      - {name: board_size, description: Total board members, unit: persons, aggregate: mean, aliases: [board members, directors]}
+
+  - id: G-LOW-CORRUPTION-REV
+    name: Revenue in low corruption-risk regions
+    category: Governance
+    unit: "%"
+    formula: revenue_low_risk_meur / revenue_meur * 100
+    higher_is_better: true
+    benchmark: {best: 95, worst: 30}
+    frameworks: [GRI 205-1, ESRS G1-3]
+    description: Share of revenue generated in countries with a low corruption-risk index.
+    inputs:
+      - {name: revenue_low_risk_meur, description: Revenue in low corruption-risk countries, unit: EUR m, aliases: [low risk revenue, revenue low corruption]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aliases: [revenue, turnover, net sales]}
+
+  - id: G-POLITICAL
+    name: Political contributions
+    category: Governance
+    unit: "% of revenue"
+    formula: political_contributions_meur / revenue_meur * 100
+    higher_is_better: false
+    benchmark: {best: 0, worst: 0.5}
+    frameworks: [GRI 415-1, ESRS G1-5]
+    description: Political contributions relative to revenue.
+    inputs:
+      - {name: political_contributions_meur, description: Political contributions, unit: EUR m, aliases: [political donations, political contributions]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aliases: [revenue, turnover]}
+
+  - id: G-FINES
+    name: Fines and legal settlements
+    category: Governance
+    unit: "% of revenue"
+    formula: fines_meur / revenue_meur * 100
+    higher_is_better: false
+    benchmark: {best: 0, worst: 1}
+    frameworks: [GRI 2-27, GRI 206-1, ESRS G1-4]
+    description: Fines and settlements (anti-competitive, corruption, non-compliance) relative to revenue.
+    inputs:
+      - {name: fines_meur, description: Fines and legal settlements paid, unit: EUR m, aliases: [fines, penalties, legal settlements]}
+      - {name: revenue_meur, description: Net revenue, unit: EUR m, aliases: [revenue, turnover]}
+
+  - id: G-ESG-CAPEX
+    name: Sustainable CapEx share
+    category: Governance
+    unit: "%"
+    formula: esg_capex_meur / total_capex_meur * 100
+    higher_is_better: true
+    benchmark: {best: 30, worst: 2}
+    frameworks: [EU Taxonomy Art. 8, ESRS E1-3]
+    description: Share of capital expenditure allocated to sustainability / taxonomy-aligned projects.
+    inputs:
+      - {name: esg_capex_meur, description: Sustainability-related CapEx, unit: EUR m, aliases: [esg capex, green capex, esg investments, sustainable capex]}
+      - {name: total_capex_meur, description: Total CapEx, unit: EUR m, aliases: [capex, capital expenditure, total capex]}
+
+  - id: G-SUPPLIER-SCREEN
+    name: Suppliers screened on ESG criteria
+    category: Governance
+    unit: "%"
+    formula: suppliers_screened / total_suppliers * 100
+    higher_is_better: true
+    benchmark: {best: 90, worst: 5}
+    frameworks: [GRI 308-1, GRI 414-1, ESRS G1-2]
+    description: Share of new or active suppliers screened using environmental and social criteria.
+    inputs:
+      - {name: suppliers_screened, description: Suppliers screened on ESG criteria, unit: count, aliases: [screened suppliers]}
+      - {name: total_suppliers, description: Total suppliers, unit: count, aliases: [suppliers, number of suppliers]}
+
+  - id: G-ESG-PAY
+    name: Executive pay linked to ESG
+    category: Governance
+    unit: "%"
+    formula: esg_linked_variable_pay / total_variable_pay * 100
+    higher_is_better: true
+    benchmark: {best: 30, worst: 0}
+    frameworks: [ESRS GOV-3, GRI 2-19]
+    description: Share of executive variable remuneration tied to ESG targets.
+    inputs:
+      - {name: esg_linked_variable_pay, description: Executive variable pay linked to ESG targets, unit: EUR, aliases: [esg linked bonus, esg bonus]}
+      - {name: total_variable_pay, description: Total executive variable pay, unit: EUR, aliases: [variable pay, bonuses, total bonuses]}
+
+  - id: G-ETHICS
+    name: Anti-corruption & whistleblowing
+    category: Governance
+    type: qualitative
+    frameworks: [GRI 205-2, ESRS G1-1, ESRS G1-3]
+    description: Narrative describing the anti-corruption programme and whistleblower protection.
+    exemplars:
+      best: >-
+        We operate a zero-tolerance anti-bribery programme certified to ISO 37001. All employees
+        complete annual anti-corruption training, high-risk third parties are screened before
+        onboarding, and an independent, anonymous whistleblowing channel protects reporters from
+        retaliation. Cases are reported to the audit committee and outcomes are disclosed.
+      worst: >-
+        We have no formal anti-corruption policy or training and no whistleblowing channel.
+        Concerns are handled informally by line managers.
+
+# --------------------------------------------------------------------- INDUSTRIES
+# weights: category weights for the composite score (materiality). Must sum to 1.
+# exclude: KPI ids not material for the industry.
+# benchmarks: industry-specific overrides of the default benchmark.
+industries:
+  - name: Oil & Gas
+    sector: Energy
+    weights: {Environmental: 0.5, Social: 0.25, Governance: 0.25}
+    benchmarks:
+      E-ENERGY-INT: {best: 200, worst: 1500}
+      E-GHG-INT: {best: 50, worst: 800}
+      E-WATER-INT: {best: 200, worst: 5000}
+  - name: Utilities
+    sector: Energy
+    weights: {Environmental: 0.5, Social: 0.25, Governance: 0.25}
+    benchmarks:
+      E-ENERGY-INT: {best: 300, worst: 3000}
+      E-GHG-INT: {best: 50, worst: 1500}
+  - name: Chemicals
+    sector: Basic Materials
+    weights: {Environmental: 0.45, Social: 0.3, Governance: 0.25}
+    benchmarks:
+      E-ENERGY-INT: {best: 150, worst: 1200}
+      E-GHG-INT: {best: 40, worst: 600}
+  - name: Mining & Metals
+    sector: Basic Materials
+    weights: {Environmental: 0.45, Social: 0.35, Governance: 0.2}
+    benchmarks:
+      E-ENERGY-INT: {best: 200, worst: 2000}
+      E-GHG-INT: {best: 60, worst: 1000}
+      E-WATER-INT: {best: 300, worst: 6000}
+  - name: Automotive
+    sector: Industrials
+    weights: {Environmental: 0.4, Social: 0.35, Governance: 0.25}
+  - name: Industrial Manufacturing
+    sector: Industrials
+    weights: {Environmental: 0.4, Social: 0.35, Governance: 0.25}
+  - name: Construction & Real Estate
+    sector: Industrials
+    weights: {Environmental: 0.4, Social: 0.35, Governance: 0.25}
+  - name: Transportation & Logistics
+    sector: Industrials
+    weights: {Environmental: 0.45, Social: 0.3, Governance: 0.25}
+    benchmarks:
+      E-ENERGY-INT: {best: 100, worst: 1500}
+      E-GHG-INT: {best: 30, worst: 600}
+  - name: Food & Beverage
+    sector: Consumer Goods
+    weights: {Environmental: 0.4, Social: 0.35, Governance: 0.25}
+  - name: Retail & Consumer Products
+    sector: Consumer Goods
+    weights: {Environmental: 0.3, Social: 0.4, Governance: 0.3}
+    exclude: [E-HAZ-WASTE]
+  - name: Healthcare & Pharmaceuticals
+    sector: Health Care
+    weights: {Environmental: 0.3, Social: 0.4, Governance: 0.3}
+  - name: Banking & Financial Services
+    sector: Financials
+    weights: {Environmental: 0.2, Social: 0.35, Governance: 0.45}
+    exclude: [E-HAZ-WASTE, E-WATER-INT, S-LTIFR, S-FATALITIES]
+  - name: Insurance
+    sector: Financials
+    weights: {Environmental: 0.2, Social: 0.35, Governance: 0.45}
+    exclude: [E-HAZ-WASTE, E-WATER-INT, S-LTIFR, S-FATALITIES]
+  - name: Software & IT Services
+    sector: Technology
+    weights: {Environmental: 0.25, Social: 0.4, Governance: 0.35}
+    exclude: [E-HAZ-WASTE, S-FATALITIES]
+  - name: Telecommunications
+    sector: Telecommunications
+    weights: {Environmental: 0.3, Social: 0.35, Governance: 0.35}
+    exclude: [E-HAZ-WASTE]
